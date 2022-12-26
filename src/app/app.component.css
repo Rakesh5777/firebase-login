@@ -1,0 +1,13 @@
+mat-toolbar {
+    justify-content: space-between;
+}
+
+.content {
+    padding: 2rem;
+}
+
+.profile-image {
+    padding-right: 0.4rem;
+    border-radius: 100%;
+    object-fit: cover;
+}

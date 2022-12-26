@@ -1,0 +1,41 @@
+<div class="form-container mat-elevation-z5">
+  <h1>Log in</h1>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <input matInput placeholder="Email" formControlName="email" />
+      <mat-error *ngIf="email?.errors?.['required']">
+        Email is <strong>required!</strong>
+      </mat-error>
+      <mat-error *ngIf="email?.errors?.['email']">
+        Email is <strong>invalid!</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input
+        matInput
+        placeholder="Password"
+        formControlName="password"
+        type="password"
+      />
+      <mat-error *ngIf="password?.errors?.['required']">
+        Password is <strong>required!</strong>
+      </mat-error>
+      <mat-error *ngIf="password?.errors?.['minlength']">
+        Password must be at least <strong>8 characters!</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="center margin-top">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="!loginForm.valid"
+      >
+        Login
+      </button>
+    </div>
+    <span class="center margin-top">
+      New to Angular Chat App? &nbsp;<a routerLink="/signup"> Sign Up!</a>
+    </span>
+  </form>
+</div>
