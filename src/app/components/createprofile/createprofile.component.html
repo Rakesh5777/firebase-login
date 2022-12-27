@@ -54,6 +54,7 @@
           placeholder="Confirm Password"
           formControlName="confirmPassword"
           type="password"
+          [errorStateMatcher]="confirmPasswordMatcher"
         />
         <mat-error *ngIf="confirmPassword?.errors?.['required']">
           Confirm Password is <strong>required!</strong>

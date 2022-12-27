@@ -4,15 +4,25 @@ import { StorageService } from '../../services/storage.service';
 import { AuthService } from './../../services/auth.service';
 import { UserService } from './../../services/user.service';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { of, switchMap, Observable, filter, concatMap, throwError } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 export function passwordMatchValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const password = control.get('password');
-    const confirmPassword = control.get('confirmPassword');
+    const password = control?.get('password');
+    const confirmPassword = control?.get('confirmPassword');
     return password && confirmPassword && password.value !== confirmPassword.value ? { 'passwordMismatch': true } : null;
+  }
+}
+
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const password = form?.form?.get('password');
+    const confirmPassword = form?.form?.get('confirmPassword');
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted)) || !!password?.value && !!confirmPassword?.value && password.value !== confirmPassword.value;
   }
 }
 
@@ -25,7 +35,7 @@ export class SignupComponent implements OnInit {
 
   public profilePic: File | null = null;
   public updatedProfilePicUrl: string | null = null;
-
+  public confirmPasswordMatcher = new MyErrorStateMatcher();
   public signUpForm = new FormGroup({
     uid: new FormControl(''),
     photoURL: new FormControl(''),
@@ -74,21 +84,19 @@ export class SignupComponent implements OnInit {
   signUp(): void {
     const { email, password } = this.signUpForm.value;
     if (!email || !password) return;
-    const toast = this.toast.loading('Signing up...');
     this.auth.signUp(email, password)
-      .pipe(this.toast.observe({
-        error: 'Something went wrong! Please try again.'
-      }))
-      .pipe(concatMap(async (user) => {
+      .pipe(switchMap(async (user) => {
         const { uid } = user.user;
         const { firstName, lastName, displayName, phone, address } = this.signUpForm.value;
         const photoURL = this.profilePic ? await this.storage.uploadProfilePic(this.profilePic, `images/profile/${uid}`) : null;
         return { firstName, lastName, displayName, phone, address, uid, photoURL } as UserProfile;
-      }), switchMap((user: UserProfile) => this.user.addUser(user)))
+      }), switchMap((user: UserProfile) => this.user.addUser(user)),
+        this.toast.observe({
+          success: 'Signed up successfully!',
+          loading: 'Signing up...',
+          error: 'Something went wrong! Please try again.'
+        }))
       .subscribe(() => {
-        toast.updateMessage('Signed up successfully!');
-        toast.updateToast({ type: 'success' });
-        toast.close();
         setTimeout(() => {
           this.router.navigateByUrl('/home');
         })
@@ -105,6 +113,9 @@ export class SignupComponent implements OnInit {
         error: 'Something went wrong! Please try again.',
       }))
       .subscribe(() => {
+        toast.updateMessage('Profile updated successfully!');
+        toast.updateToast({ type: 'success' });
+        toast.close();
       });
   }
 
