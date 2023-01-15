@@ -2,12 +2,15 @@ mat-toolbar {
     justify-content: space-between;
 }
 
-.content {
-    padding: 2rem;
-}
-
 .profile-image {
-    padding-right: 0.4rem;
+    margin-right: 0.4rem !important;
     border-radius: 100%;
     object-fit: cover;
+    width: 30px;
+    height: 30px;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
 }
