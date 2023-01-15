@@ -3,12 +3,16 @@
     gap: 1rem;
 }
 
+.row mat-form-field {
+    width: calc(50% - 0.5rem);
+}
+
 .image-container {
     position: relative;
 }
 
 .image-container img {
-    border-radius: 100%;
+    border-radius: 50%;
     object-fit: cover;
     margin-bottom: 2rem;
 }
@@ -16,5 +20,17 @@
 .edit-icon {
     position: absolute;
     bottom: 1.8rem;
-    right: 120px;
+    right: 90px;
+}
+
+.signup-with {
+    height : 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.google {
+    margin-top: -0.5rem;
+    padding-left: 0.5rem;
 }
